@@ -1,7 +1,13 @@
 {
   "expo": {
-    "name": "setup",
-    "slug": "setup",
-    "version": "1.0.0"
+    "name": "nearby",
+    "slug": "nearby",
+    "scheme": "nearby",
+    "version": "1.0.0",
+    "newArchEnabled": true,
+    "plugins": [
+      "expo-router",
+      "expo-font"
+    ]
   }
 }
