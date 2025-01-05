@@ -23,7 +23,7 @@ function Button({ children, style, isLoading = false, ...rest }: ButtonProps) {
       {...rest}
     >
       {isLoading ? (
-        <ActivityIndicator className="bg-gray-100" size={"small"} />
+        <ActivityIndicator className="text-gray-100" size={"small"} />
       ) : (
         children
       )}
@@ -32,7 +32,7 @@ function Button({ children, style, isLoading = false, ...rest }: ButtonProps) {
 }
 function Title({ children }: TextProps) {
   return (
-    <Text className="bg-gray-100 font-semiBold text-base">{children}</Text>
+    <Text className="text-gray-100 font-semiBold text-base">{children}</Text>
   );
 }
 
