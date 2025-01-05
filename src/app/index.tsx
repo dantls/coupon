@@ -1,3 +1,4 @@
+import { Button } from "@/components/button";
 import { Steps } from "@/components/steps";
 import { Welcome } from "@/components/welcome";
 import { StatusBar } from "expo-status-bar";
@@ -9,6 +10,9 @@ export default function App() {
       <StatusBar style="auto" />
       <Welcome />
       <Steps />
+      <Button>
+        <Button.Title>Start</Button.Title>
+      </Button>
     </View>
   );
 }

@@ -1,6 +1,7 @@
 import { Text, View } from "react-native";
-import { Step } from "../step";
+
 import { IconMapPin, IconQrcode, IconTicket } from "@tabler/icons-react-native";
+import { Step } from "../step";
 
 export function Steps() {
   return (

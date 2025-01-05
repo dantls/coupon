@@ -10,7 +10,7 @@ type Props = {
 export function Step({ title, description, icon: Icon }: Props) {
   return (
     <View className="w-full flex-row gap-4">
-      {Icon && <Icon size={32} className="color-red-base" />}
+      {Icon && <Icon size={32} color="red" />}
       <View className="flex-1">
         <Text className="color-gray-600 font-semiBold text-base">{title}</Text>
         <Text className="color-gray-500 font-regular text-sm mt-1">
