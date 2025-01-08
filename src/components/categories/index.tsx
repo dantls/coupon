@@ -16,7 +16,16 @@ export const Categories = ({ data }: Props) => {
     <FlatList
       data={data}
       keyExtractor={(item) => item.name}
-      renderItem={({ item }) => <Category name={item.name} iconId={item.id} />}
+      renderItem={({ item }) => (
+        <Category isSelected name={item.name} iconId={item.id} />
+      )}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={{
+        gap: 8,
+        paddingHorizontal: 24,
+      }}
+      style={{ maxHeight: 36, position: "absolute", zIndex: 1, top: 64 }}
     />
   );
 };
