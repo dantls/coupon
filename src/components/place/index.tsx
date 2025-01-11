@@ -33,7 +33,9 @@ export function Place({ data, ...rest }: Props) {
       />
       <View className="gap-2 flex-1">
         <Text className="text-sm font-semiBold">{data.name}</Text>
-        <Text className="text-xs font-regular text">{data.description}</Text>
+        <Text className="text-xs font-regular" numberOfLines={2}>
+          {data.description}
+        </Text>
 
         <View className="flex-row items-center gap-[6px]">
           <IconTicket size={16} color={colors.red.base} />
