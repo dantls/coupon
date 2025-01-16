@@ -11,7 +11,7 @@ export default function Market() {
       const { data } = await api.get(`/markets/${params.id}`);
     } catch (error) {
       console.log(error);
-      Alert.alert("Erro", "Could not load data");
+      Alert.alert("Error", "Could not load data");
     }
   }
 
