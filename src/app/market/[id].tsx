@@ -1,10 +1,12 @@
 import { View, Text, Alert } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { api } from "@/services/api";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function Market() {
   const params = useLocalSearchParams<{ id: string }>();
+  const [coupon, setCoupon] = useState<string | null>();
+  const [couponIsFetching, setCouponIsFetching] = useState(false);
 
   async function fetchMarket() {
     try {
@@ -12,6 +14,19 @@ export default function Market() {
     } catch (error) {
       console.log(error);
       Alert.alert("Error", "Could not load data");
+    }
+  }
+  async function getCoupon(id: string) {
+    try {
+      setCouponIsFetching(true);
+      const { data } = await api.patch("/coupons/" + id);
+      Alert.alert("Coupom", data.coupon);
+      setCoupon(data.coupon);
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error", "Could not load data");
+    } finally {
+      setCouponIsFetching(false);
     }
   }
 
