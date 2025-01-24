@@ -3,7 +3,6 @@ import { useLocalSearchParams } from "expo-router";
 import { api } from "@/services/api";
 import { useEffect, useRef, useState } from "react";
 import { useCameraPermissions, CameraView } from "expo-camera";
-import { Button } from "@/components/button";
 
 
 export default function Market() {
@@ -89,14 +88,6 @@ export default function Market() {
             }
           }}
         />
-        <View style={{ position: "absolute", bottom: 32, left: 32, right: 32 }}>
-          <Button
-            onPress={() => setIsVisibleCameraModal(false)}
-            isLoading={couponIsFetching}
-          >
-            <Button.Title>Back</Button.Title>
-          </Button>
-        </View>
     </View>
   );
 }
