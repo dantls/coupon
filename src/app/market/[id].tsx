@@ -3,12 +3,12 @@ import { useLocalSearchParams } from "expo-router";
 import { api } from "@/services/api";
 import { useEffect, useRef, useState } from "react";
 import { useCameraPermissions, CameraView } from "expo-camera";
-
+import { Button } from "@/components/button";
 
 export default function Market() {
   const params = useLocalSearchParams<{ id: string }>();
   const [coupon, setCoupon] = useState<string | null>();
-  const [couponIsFetching, setCouponIsFetching] = useState(false); 
+  const [couponIsFetching, setCouponIsFetching] = useState(false);
   const [isVisibleCameraModal, setIsVisibleCameraModal] = useState(false);
   const [_, requestPermission] = useCameraPermissions();
   const qrLock = useRef(false);
@@ -88,6 +88,15 @@ export default function Market() {
             }
           }}
         />
+        <View style={{ position: "absolute", bottom: 32, left: 32, right: 32 }}>
+          <Button
+            onPress={() => setIsVisibleCameraModal(false)}
+            isLoading={couponIsFetching}
+          >
+            <Button.Title>Back</Button.Title>
+          </Button>
+        </View>
+      </Modal>
     </View>
   );
 }
