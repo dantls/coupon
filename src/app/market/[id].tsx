@@ -1,18 +1,27 @@
-import { View, Text, Alert, Modal } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { View, Text, Alert, Modal, ScrollView, StatusBar } from "react-native";
+import { Redirect, useLocalSearchParams } from "expo-router";
 import { api } from "@/services/api";
 import { useEffect, useRef, useState } from "react";
 import { useCameraPermissions, CameraView } from "expo-camera";
 import { Button } from "@/components/button";
+import { Cover } from "./cover";
+import { Details, PropsDetails } from "./details";
+import { Coupon } from "./coupon";
+import { Loading } from "@/components/loading";
+
+type DataProps = PropsDetails & {
+  cover: string;
+};
 
 export default function Market() {
+  const [data, setData] = useState<DataProps>();
   const params = useLocalSearchParams<{ id: string }>();
   const [coupon, setCoupon] = useState<string | null>();
   const [couponIsFetching, setCouponIsFetching] = useState(false);
   const [isVisibleCameraModal, setIsVisibleCameraModal] = useState(false);
   const [_, requestPermission] = useCameraPermissions();
   const qrLock = useRef(false);
-
+  const [isLoading, setIsLoading] = useState(true);
   async function fetchMarket() {
     try {
       const { data } = await api.get(`/markets/${params.id}`);
@@ -73,9 +82,27 @@ export default function Market() {
     fetchMarket();
   }, [params.id]);
 
+  if (isLoading) return <Loading />;
+
+  if (!data) {
+    return <Redirect href="/home" />;
+  }
+
   return (
     <View className="flex-1 justify-center items-center">
-      <Text>{params.id}</Text>
+      <StatusBar barStyle={"light-content"} hidden={false} />
+
+      <ScrollView showsHorizontalScrollIndicator={false}>
+        <Cover uri={data.cover} />
+        <Details data={data} />
+        {coupon && <Coupon code={coupon} />}
+      </ScrollView>
+
+      <View style={{ padding: 32 }}>
+        <Button onPress={() => handleOpenCamera()}>
+          <Button.Title>Ler QR Code</Button.Title>
+        </Button>
+      </View>
 
       <Modal style={{ flex: 1 }} visible={isVisibleCameraModal}>
         <CameraView
