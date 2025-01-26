@@ -1,11 +1,19 @@
-import { View, Text, Alert, Modal } from "react-native";
+import { View, Text, Alert, Modal, StatusBar } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { api } from "@/services/api";
 import { useEffect, useRef, useState } from "react";
 import { useCameraPermissions, CameraView } from "expo-camera";
 import { Button } from "@/components/button";
+import { ScrollView } from "react-native-gesture-handler";
+import { Details, PropsDetails } from "@/components/market/details";
+import { Cover } from "./cover";
+import { Coupon } from "./coupon";
+type DataProps = PropsDetails & {
+  cover: string;
+};
 
 export default function Market() {
+  const [data, setData] = useState<DataProps>();
   const params = useLocalSearchParams<{ id: string }>();
   const [coupon, setCoupon] = useState<string | null>();
   const [couponIsFetching, setCouponIsFetching] = useState(false);
@@ -74,8 +82,20 @@ export default function Market() {
   }, [params.id]);
 
   return (
-    <View className="flex-1 justify-center items-center">
-      <Text>{params.id}</Text>
+    <View className="flex-1">
+      <StatusBar barStyle={"light-content"} hidden={false} />
+
+      <ScrollView showsHorizontalScrollIndicator={false}>
+        <Cover uri={data.cover} />
+        <Details data={data} />
+        {coupon && <Coupon code={coupon} />}
+      </ScrollView>
+
+      <View style={{ padding: 32 }}>
+        <Button onPress={() => handleOpenCamera()}>
+          <Button.Title>Ler QR Code</Button.Title>
+        </Button>
+      </View>
 
       <Modal style={{ flex: 1 }} visible={isVisibleCameraModal}>
         <CameraView
