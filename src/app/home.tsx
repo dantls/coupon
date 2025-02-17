@@ -8,6 +8,8 @@ import MapView, { Callout, Marker } from "react-native-maps";
 
 import * as Location from "expo-location";
 import { router } from "expo-router";
+import { colors } from "@/styles/colors";
+import { fontFamily } from "@/styles/font-family";
 
 type MarketsProps = PlaceProps & {
   latitude: number;
@@ -36,6 +38,19 @@ export default function Home() {
     }
   }
 
+  async function fetchMarkets() {
+    try {
+      if (!category) {
+        return;
+      }
+
+      const { data } = await api.get(`/markets/category/${category}`);
+      setMarkets(data);
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Places", "Could not load places.");
+    }
+  }
   async function fetchCategories() {
     try {
       const { data } = await api.get("/categories");
@@ -46,32 +61,13 @@ export default function Home() {
       Alert.alert("Could not load category");
     }
   }
-  async function fetchPlaces() {
-    try {
-      if (!category) {
-        return;
-      }
-
-      const { data } = await api.get("/markets/category/" + category);
-      setMarkets(data);
-
-      console.log(data);
-    } catch (error) {
-      console.log(error);
-      Alert.alert("Could not load places ");
-    }
-  }
 
   useEffect(() => {
     fetchCategories();
   }, []);
 
   useEffect(() => {
-    getCurrentLocation();
-  }, []);
-
-  useEffect(() => {
-    fetchPlaces();
+    fetchMarkets();
   }, [category]);
 
   return (
@@ -112,11 +108,22 @@ export default function Home() {
           >
             <Callout onPress={() => router.navigate(`/market/${item.id}`)}>
               <View>
-                {item.name}
-                <Text className="text-xs color-gray-600 font-regular">
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: colors.gray[600],
+                    fontFamily: fontFamily.medium,
+                  }}
+                >
                   {item.name}
                 </Text>
-                <Text className="text-xs color-gray-600 font-regular">
+                <Text
+                  style={{
+                    fontSize: 12,
+                    color: colors.gray[600],
+                    fontFamily: fontFamily.medium,
+                  }}
+                >
                   {item.address}
                 </Text>
               </View>

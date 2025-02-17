@@ -1,13 +1,15 @@
-import { View, Text, Alert, Modal, ScrollView, StatusBar } from "react-native";
-import { Redirect, useLocalSearchParams } from "expo-router";
-import { api } from "@/services/api";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { View, Alert, Modal, StatusBar, ScrollView } from "react-native";
+import { router, useLocalSearchParams, Redirect } from "expo-router";
 import { useCameraPermissions, CameraView } from "expo-camera";
+
 import { Button } from "@/components/button";
-import { Cover } from "./cover";
-import { Details, PropsDetails } from "./details";
-import { Coupon } from "./coupon";
 import { Loading } from "@/components/loading";
+import { Cover } from "@/components/market/cover";
+import { Coupon } from "@/components/market/coupon";
+import { Details, PropsDetails } from "@/components/market/details";
+
+import { api } from "@/services/api";
 
 type DataProps = PropsDetails & {
   cover: string;
@@ -15,51 +17,31 @@ type DataProps = PropsDetails & {
 
 export default function Market() {
   const [data, setData] = useState<DataProps>();
-  const params = useLocalSearchParams<{ id: string }>();
-  const [coupon, setCoupon] = useState<string | null>();
+  const [coupon, setCoupon] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [couponIsFetching, setCouponIsFetching] = useState(false);
   const [isVisibleCameraModal, setIsVisibleCameraModal] = useState(false);
+
   const [_, requestPermission] = useCameraPermissions();
+  const params = useLocalSearchParams<{ id: string }>();
+
   const qrLock = useRef(false);
-  const [isLoading, setIsLoading] = useState(true);
+  console.log(params.id);
+
   async function fetchMarket() {
     try {
       const { data } = await api.get(`/markets/${params.id}`);
+      setData(data);
+      setIsLoading(false);
     } catch (error) {
       console.log(error);
-      Alert.alert("Error", "Could not load data");
-    }
-  }
-  async function getCoupon(id: string) {
-    try {
-      setCouponIsFetching(true);
-      const { data } = await api.patch("/coupons/" + id);
-      Alert.alert("Coupom", data.coupon);
-      setCoupon(data.coupon);
-    } catch (error) {
-      console.log(error);
-      Alert.alert("Error", "Could not load data");
-    } finally {
-      setCouponIsFetching(false);
-    }
-  }
-
-  function handleUseCoupon(id: string) {
-    setIsVisibleCameraModal(false);
-    Alert.alert(
-      "Coupon",
-      "Redeemed coupon cannot be reused. Do you really want to redeem the coupon?",
-      [
+      Alert.alert("Error", "Could not load data", [
         {
-          style: "cancel",
-          text: "No",
+          text: "OK",
+          onPress: () => router.back(),
         },
-        {
-          text: "Yes",
-          onPress: () => getCoupon(id),
-        },
-      ]
-    );
+      ]);
+    }
   }
 
   async function handleOpenCamera() {
@@ -78,29 +60,60 @@ export default function Market() {
     }
   }
 
+  async function getCoupon(id: string) {
+    try {
+      setCouponIsFetching(true);
+
+      const { data } = await api.patch("/coupons/" + id);
+
+      Alert.alert("Coupon", data.coupon);
+      setCoupon(data.coupon);
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error", "It doesn`t possible to access the coupon");
+    } finally {
+      setCouponIsFetching(false);
+    }
+  }
+
+  function handleUseCoupon(id: string) {
+    setIsVisibleCameraModal(false);
+
+    Alert.alert(
+      "Coupon",
+      "It is not possible to reuse a redeemed coupon. Do you really want to redeem the coupon?",
+      [
+        { style: "cancel", text: "No" },
+        { text: "Yes", onPress: () => getCoupon(id) },
+      ]
+    );
+  }
+
   useEffect(() => {
     fetchMarket();
-  }, [params.id]);
+  }, [params.id, coupon]);
 
-  if (isLoading) return <Loading />;
+  if (isLoading) {
+    return <Loading />;
+  }
 
   if (!data) {
     return <Redirect href="/home" />;
   }
 
   return (
-    <View className="flex-1 justify-center items-center">
-      <StatusBar barStyle={"light-content"} hidden={false} />
+    <View style={{ flex: 1 }}>
+      <StatusBar barStyle="light-content" hidden={isVisibleCameraModal} />
 
-      <ScrollView showsHorizontalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <Cover uri={data.cover} />
         <Details data={data} />
         {coupon && <Coupon code={coupon} />}
       </ScrollView>
 
       <View style={{ padding: 32 }}>
-        <Button onPress={() => handleOpenCamera()}>
-          <Button.Title>Ler QR Code</Button.Title>
+        <Button onPress={handleOpenCamera}>
+          <Button.Title>Read QR Code</Button.Title>
         </Button>
       </View>
 
@@ -115,6 +128,7 @@ export default function Market() {
             }
           }}
         />
+
         <View style={{ position: "absolute", bottom: 32, left: 32, right: 32 }}>
           <Button
             onPress={() => setIsVisibleCameraModal(false)}
